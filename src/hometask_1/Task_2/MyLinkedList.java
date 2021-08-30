@@ -1,4 +1,5 @@
 package hometask_1.Task_2;
+
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -104,19 +105,36 @@ public class MyLinkedList<T> implements Iterable<T> {
         return value;
     }
 
-    private T removeNode(Node<T> node) {
+    private void removeNode(Node<T> node) {
         if (node == head)
-            return removeFirst();
-        if (node == tail)
-            return removeLast();
+            removeFirst();
+        else if (node == tail)
+            removeLast();
+        else {
+            Node<T> prev = node.prev;
+            prev.next = node.next;
+            node.next.prev = node.prev;
+            size--;
+            modCount++;
+        }
+    }
 
-        Node<T> prev = node.prev;
-        prev.next = node.next;
-        node.next.prev = node.prev;
-        size--;
-        modCount++;
+    private void addNodeBetween(T value, Node<T> left, Node<T> right) {
+        if (right == head)
+            addFirst(value);
+        else if (left == tail)
+            addLast(value);
+        else {
+            if (left == null || right == null)
+                throw new NullPointerException("One of the params (left or right) is null");
 
-        return node.value;
+            Node<T> newNode = new Node<>(value, left, right);
+            left.next = newNode;
+            right.prev = newNode;
+
+            size++;
+            modCount++;
+        }
     }
 
     @Override
@@ -129,114 +147,117 @@ public class MyLinkedList<T> implements Iterable<T> {
     }
 
     private final class ListIteratorImpl implements ListIterator<T> {
-        private Node<T> cur = head;
+        private Node<T> next = head;
         private Node<T> lastReturned;
-        private int index;
-//        private final int constSize = size;
+        private int nextIndex;
         private int expectedModCount = modCount;
 
-        // Methods "next()" and "previous()" set this field to true;
-        private boolean curIndexCanBeUsed = false;
-
-        private void checkIfBothModify() {
+        private void checkConcurrencyModification() {
             if (expectedModCount != modCount)
                 throw new ConcurrentModificationException();
         }
 
         @Override
         public boolean hasNext() {
-            return index < size;
+            return nextIndex < size;
         }
 
         @Override
         public T next() {
-            checkIfBothModify();
+            checkConcurrencyModification();
             if (!hasNext())
-                throw new NoSuchElementException();
+                throw new IllegalStateException();
 
-            T value = cur.value;
-            lastReturned = cur;
-            cur = cur.next;
-            index++;
-            curIndexCanBeUsed = true;
+            T value = next.value;
+            lastReturned = next;
+            next = next.next;
+            nextIndex++;
+
             return value;
         }
 
         @Override
         public boolean hasPrevious() {
-            return index > 0;
+            return nextIndex > 0;
         }
 
         @Override
         public T previous() {
-            checkIfBothModify();
-            if (!hasPrevious())
-                throw new NoSuchElementException();
+            checkConcurrencyModification();
 
-            T value;
-            if (cur == null) {
-                value = lastReturned.value;
-                cur = lastReturned;
-            }
+            if (!hasPrevious())
+                throw new IllegalStateException();
+
+            if (next == null)
+                next = lastReturned = tail;
             else {
-                value = cur.prev.value;
-                cur = cur.prev;
-                lastReturned = cur;
+                lastReturned = next.prev;
+                next = lastReturned;
             }
-            index--;
-            curIndexCanBeUsed = true;
-            return value;
+
+            nextIndex--;
+
+            return lastReturned.value;
         }
 
         @Override
         public int nextIndex() {
-            return index;
+            return nextIndex;
         }
 
         @Override
         public int previousIndex() {
-            return index - 1;
+            return nextIndex - 1;
         }
 
         @Override
         public void remove() {
-            checkIfBothModify();
-            if (lastReturned == null || !curIndexCanBeUsed)
+            checkConcurrencyModification();
+
+            if (lastReturned == null)
                 throw new IllegalStateException("No elements have been read yet");
+
+            Node<T> lastReturnedNext = lastReturned.next;
+
             removeNode(lastReturned);
-            curIndexCanBeUsed = false;
+
+            // means that a removal is made after "previous" operation
+            if (lastReturned == next)
+                next = lastReturnedNext;
+                // means that a removal is made after "next" operation
+            else
+                nextIndex--;
+
+            lastReturned = null;
             expectedModCount++;
         }
 
         @Override
         public void set(T e) {
-            checkIfBothModify();
-            if (lastReturned == null || !curIndexCanBeUsed)
+            checkConcurrencyModification();
+
+            if (lastReturned == null)
                 throw new IllegalStateException("No elements have been read yet");
+
             lastReturned.value = e;
         }
 
         @Override
         public void add(T e) {
-            checkIfBothModify();
+            checkConcurrencyModification();
 
-            if (index == 0) {
-                addFirst(e);
-                index = 1;
-            }
-            else if (lastReturned == tail)
-                addLast(e);
-            else {
-                Node<T> node = new Node<>(e, lastReturned, cur);
-                lastReturned.next = node;
-                lastReturned = lastReturned.next;
-                cur.prev = node;
-                modCount++;
-                size++;
-                index++;
-            }
+            // add the first element
+            if (!hasPrevious())
+                addNodeBetween(e, null, head);
+                // add the last element
+            else if (!hasNext())
+                addNodeBetween(e, tail, null);
+            else
+                addNodeBetween(e, next.prev, next);
 
+            lastReturned = null;
             expectedModCount++;
+            nextIndex++;
         }
     }
 
@@ -248,7 +269,7 @@ public class MyLinkedList<T> implements Iterable<T> {
         var sb = new StringBuilder("[");
         for (T t : this) {
             sb.append(t.toString())
-              .append(", ");
+                    .append(", ");
         }
         sb.delete(sb.length() - 2, sb.length());
         sb.append(']');
