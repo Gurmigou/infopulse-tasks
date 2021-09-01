@@ -5,6 +5,7 @@ public class Task_1 {
         int n = 5;
         System.out.println("Recursive: " + factorialRecursive(n));
         System.out.println("Iterative: " + factorialIterative(n));
+
     }
 
     static int factorialRecursive(int n) {
