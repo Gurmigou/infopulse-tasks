@@ -7,5 +7,6 @@ public class ClassLoaderTestMain {
         System.out.println("String classloader: " + String.class.getClassLoader());
         System.out.println("Random classloader: " + Random.class.getClassLoader());
         System.out.println("My class classloader: " + ClassLoaderTestMain.class.getClassLoader());
+
     }
 }
