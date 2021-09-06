@@ -3,7 +3,7 @@ package hometask_3.ObjectMapper;
 public class Entity {
     private String entityName;
 
-    @ColumnName("ag")
+    @FieldName("ag")
     private Integer ageTest;
 
     private String age;

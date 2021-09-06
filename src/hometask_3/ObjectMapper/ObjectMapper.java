@@ -25,7 +25,7 @@ public class ObjectMapper {
         var namesSet = new HashSet<String>();
 
         for (Field fromField : mapFromArr) {
-            ColumnName annotation = fromField.getAnnotation(ColumnName.class);
+            FieldName annotation = fromField.getAnnotation(FieldName.class);
             String fieldName;
 
             if (annotation != null)
