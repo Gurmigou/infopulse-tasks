@@ -4,10 +4,13 @@ public class Entity {
     private String entityName;
 
     @ColumnName("ag")
-    private Integer age;
+    private Integer ageTest;
 
-    public Entity(String entityName, Integer age) {
+    private String age;
+
+    public Entity(String entityName, Integer ageTest, String age) {
         this.entityName = entityName;
+        this.ageTest = ageTest;
         this.age = age;
     }
 }

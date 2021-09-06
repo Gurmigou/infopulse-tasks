@@ -5,11 +5,17 @@ public class DTO {
 
     private Integer ag;
 
+    private Integer age;
+
     public String getEntityName() {
         return entityName;
     }
 
     public Integer getag() {
         return ag;
+    }
+
+    public Integer getAge() {
+        return age;
     }
 }

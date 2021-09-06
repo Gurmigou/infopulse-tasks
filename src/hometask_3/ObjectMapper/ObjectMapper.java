@@ -2,6 +2,7 @@ package hometask_3.ObjectMapper;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
 
 public class ObjectMapper {
@@ -21,17 +22,24 @@ public class ObjectMapper {
     private static <T, Q> void mapAssociatedFields(Field[] mapFromArr, Field[] mapToArr, T objFrom, Q objTo)
             throws NoSuchFieldException, IllegalAccessException
     {
+        var namesSet = new HashSet<String>();
+
         for (Field fromField : mapFromArr) {
             ColumnName annotation = fromField.getAnnotation(ColumnName.class);
-            String columnName;
+            String fieldName;
 
             if (annotation != null)
-                columnName = annotation.value();
+                fieldName = annotation.value();
             else
-                columnName = fromField.getName();
+                fieldName = fromField.getName();
 
-            Field toField = findField(mapToArr, fromField.getType(), columnName)
+            Field toField = findField(mapToArr, fromField.getType(), fieldName)
                     .orElseThrow(NoSuchFieldException::new);
+
+            if (namesSet.contains(fieldName))
+                throw new IllegalStateException("Duplication of fields: field \"" + fieldName + "\" has duplicates");
+            else
+                namesSet.add(fieldName);
 
             toField.set(objTo, fromField.get(objFrom));
         }
