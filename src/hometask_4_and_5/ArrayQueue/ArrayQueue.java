@@ -1,4 +1,4 @@
-package hometask_4.ArrayQueue;
+package hometask_4_and_5.ArrayQueue;
 
 public class ArrayQueue<E> {
     private E[] queue;

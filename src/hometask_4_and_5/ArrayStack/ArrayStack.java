@@ -1,4 +1,4 @@
-package hometask_4.ArrayStack;
+package hometask_4_and_5.ArrayStack;
 
 public class ArrayStack<E> {
     private E[] stack;

@@ -1,4 +1,4 @@
-package hometask_4.JsonParser;
+package hometask_4_and_5.JsonParser;
 
 import java.util.*;
 

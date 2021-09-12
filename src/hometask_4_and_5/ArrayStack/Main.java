@@ -1,4 +1,4 @@
-package hometask_4.ArrayStack;
+package hometask_4_and_5.ArrayStack;
 
 public class Main {
     public static void main(String[] args) {

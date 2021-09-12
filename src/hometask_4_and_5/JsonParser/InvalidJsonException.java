@@ -1,4 +1,4 @@
-package hometask_4.JsonParser;
+package hometask_4_and_5.JsonParser;
 
 public class InvalidJsonException extends Throwable {
     public InvalidJsonException() {
