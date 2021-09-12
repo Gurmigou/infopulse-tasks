@@ -10,6 +10,7 @@ public class ObjectMapper {
         Field[] declaredFields = clazz.getDeclaredFields();
         for (Field field : declaredFields)
             field.setAccessible(true);
+
         return declaredFields;
     }
 

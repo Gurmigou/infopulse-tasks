@@ -21,6 +21,9 @@ public class MyStack<E> {
     }
 
     public E pop() {
+        if (isEmpty())
+            return null;
+
         E toReturn = top.value;
         top = top.prev;
         size--;
